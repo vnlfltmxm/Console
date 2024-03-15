@@ -9,6 +9,8 @@
             filedSize = new int[xSize, ySize];
         }
 
+
+
         public void PrintFiled()
         {
             for (int i = 0; i < filedSize.GetLength(0); i++)
