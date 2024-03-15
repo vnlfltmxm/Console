@@ -4,10 +4,22 @@
     {
         static void Main(string[] args)
         {
-            Filed f = new Filed(30, 50);
+            Map f = new Map(30, 50);
+            Player player = new Player();
+            GameManger g = new GameManger(f, player);
 
-            f.PrintFiled();
+            f.CreateMape();
+               
+            while (true)
+            {
+                g.SetPlayer();
+               // f.PrintMap();//플레이어 사방으로 박스 생성을 막아야함
+                f.BufferPrint();
+                
+                player.Move();
+            }
             
+
         }
     }
 }
