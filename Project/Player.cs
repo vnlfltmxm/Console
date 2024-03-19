@@ -10,28 +10,86 @@ namespace Project
     internal class Player: Unit
     {
         Map map;
-        List<Boom> _boom;
         Queue<Boom> _boomQueue;
 
         private int _fireLength;
+        private int _maxBoomCount;
         private int _boomCount;
 
         public int fireLength { get { return _fireLength; } set { _fireLength = value; } }
+        public int maxBoomCount { get { return _maxBoomCount; } set { _maxBoomCount = value; } }
         public int boomCount { get { return _boomCount; } set { _boomCount = value; } }
-        public List<Boom> boom { get { return _boom; } set { _boom = value; } }
         public Queue<Boom> boomq { get { return _boomQueue; } set { _boomQueue = value; } }
 
-        public Player(Map map) : base(10)
+        public Player(Map map) : base()
         {
             this.map = map;
-            _boom = new List<Boom>();
+            _maxBoomCount = 1;
             _boomQueue = new Queue<Boom>();
             posX = 10;
             posY = 10;
             beforePosX = posX;
             beforePosY = posY;
-            _fireLength = 4;
+            _fireLength = 2;
             _boomCount = 1;
+            
+        }
+
+        public bool MoveRightCheck()
+        {
+            switch (map.map[posY, posX + 1])
+            {
+                case eMapState.WILL:
+                    return false;
+                case eMapState.BOX:
+                    return false;
+                case eMapState.BOOM:
+                    return false;
+                default:
+                    return true;
+            }
+        }
+        public bool MoveUPCheck()
+        {
+            switch (map.map[posY - 1, posX])
+            {
+                case eMapState.WILL:
+                    return false;
+                case eMapState.BOX:
+                    return false;
+                case eMapState.BOOM:
+                    return false;
+                default:
+                    return true;
+            }
+        }
+        public bool MoveLeftCheck()
+        {
+            switch (map.map[posY, posX - 1])
+            {
+                case eMapState.WILL:
+                    return false;
+                case eMapState.BOX:
+                    return false;
+                case eMapState.BOOM:
+                    return false;
+                default:
+                    return true;
+            }
+        }
+        public bool MoveDownCheck()
+        {
+            switch (map.map[posY + 1 , posX])
+            {
+                case eMapState.WILL:
+                    return false;
+                case eMapState.BOX:
+                    return false;
+                case eMapState.BOOM:
+                    return false;
+                default:
+                    return true;
+            }
         }
 
         public void PlayerAction()
@@ -46,15 +104,16 @@ namespace Project
             switch (key.Key)
             {
                 case ConsoleKey.RightArrow:
-                    if (map.map[posY, (posX) + 1] == eMapState.NULL || map.map[posY , posX + 1] == eMapState.ITEM)
+                    if (MoveRightCheck() == true)
                     {
                         RightMove();
                         if (map.map[beforePosY, beforePosX] != eMapState.BOOM)
                         {
                             map.map[beforePosY, beforePosX] = eMapState.NULL;
                         }
+                        GetItem();
                         map.map[posY, posX] = eMapState.PLAYER;
-                       
+                        
                         
                         break;
                     }
@@ -63,13 +122,14 @@ namespace Project
                         return;
                     }
                 case ConsoleKey.LeftArrow:
-                    if (map.map[posY, (posX) - 1] == eMapState.NULL || map.map[posY , posX - 1] == eMapState.ITEM)
+                    if (MoveLeftCheck() == true)
                     {
                         LeftMove();
                         if (map.map[beforePosY, beforePosX] != eMapState.BOOM)
                         {
                             map.map[beforePosY, beforePosX] = eMapState.NULL;
                         }
+                        GetItem();
                         map.map[posY, posX] = eMapState.PLAYER;
                         break;
                     }
@@ -78,13 +138,14 @@ namespace Project
                         return;
                     }
                 case ConsoleKey.UpArrow:
-                    if (map.map[(posY) - 1, posX] == eMapState.NULL || map.map[posY - 1, posX] == eMapState.ITEM)
+                    if (MoveUPCheck() == true)
                     {
                         UPMove();
                         if (map.map[beforePosY, beforePosX] != eMapState.BOOM)
                         {
                             map.map[beforePosY, beforePosX] = eMapState.NULL;
                         }
+                        GetItem();
                         map.map[posY, posX] = eMapState.PLAYER;
                         break;
                     }
@@ -93,13 +154,14 @@ namespace Project
                         return;
                     }
                 case ConsoleKey.DownArrow:
-                    if (map.map[posY + 1, posX] == eMapState.NULL || map.map[posY + 1, posX] == eMapState.ITEM)
+                    if (MoveDownCheck() == true)
                     {
                         DownMove();
                         if (map.map[beforePosY, beforePosX] != eMapState.BOOM)
                         {
                             map.map[beforePosY, beforePosX] = eMapState.NULL;
                         }
+                        GetItem();
                         map.map[posY, posX] = eMapState.PLAYER;
                         break;
                     }
@@ -108,12 +170,21 @@ namespace Project
                         return;
                     }
                 case ConsoleKey.Spacebar:
-                    SetBoom();
+                    if (_boomCount <= _maxBoomCount && map.map[posY, posX] != eMapState.BOOM)
+                    {
+                        _boomCount++;
+                        SetBoom();
+
+                    }
+                    
                     break;
 
 
 
             }
+
+            
+
             while (Console.KeyAvailable)
             {
                 Console.ReadKey(false);
@@ -128,34 +199,44 @@ namespace Project
             beforePosX = posX;
             beforePosY = posY;
             posX++;
-            moveCount--;
         }
         public void LeftMove()
         {
             beforePosX = posX;
             beforePosY = posY;
             posX--;
-            moveCount--;
         }
         public void UPMove()
         {
             beforePosX = posX;
             beforePosY = posY;
             posY--;
-            moveCount--;
         }
         public void DownMove()
         {
             beforePosX = posX;
             beforePosY = posY;
             posY++;
-            moveCount--;
+        }
+
+        public void GetItem()
+        {
+            switch (map.map[posY,posX])
+            {
+                case eMapState.FIRELENGTHITEM:
+                    _fireLength++;
+                    break;
+                case eMapState.BOOMPLUSITEM:
+                    _maxBoomCount++;
+                    break;
+                    
+            }
         }
 
         private void SetBoom()
         {
             map.map[posY, posX] = eMapState.BOOM;
-            _boomQueue.Enqueue(new Boom(20, posX, posY, _fireLength, map));
+            _boomQueue.Enqueue(new Boom(posX, posY, _fireLength, map));
 
 
         }

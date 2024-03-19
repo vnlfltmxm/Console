@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 
 
@@ -15,12 +17,21 @@ namespace Project
         private Map map;
         private Player player;
         private List<Monster> monsters;
+        private Dictionary<int, Monster> monster;
+        private int _mNum;
+        public bool b;
+       // Queue<System.Timers.Timer> timer2; //= new System.Timers.Timer(3000);
+
 
         public GameManger(Map map, Player player)
         {
+            //timer2 = new Queue<System.Timers.Timer>();
+            _mNum = 0;
             monsters = new List<Monster>();
+            monster = new Dictionary<int, Monster>();
             this.map = map;
             this.player = player;
+            b=false;
 
         }
 
@@ -102,28 +113,149 @@ namespace Project
 
 
         //}
-        public void SetMoveMonster()
+        //public void SetMoveMonster()
+        //{
+        //    foreach (Monster m in monsters)
+        //    {
+        //        map.map[m.beforePosY, m.beforePosX] = eMapState.NULL;
+        //        map.map[m.posY, m.posX] = eMapState.MONSTER;
+        //    }
+        //}
+        public void RespownM(int posX,int posY,int Num, Map map)
         {
-            foreach (Monster m in monsters)
-            {
-                map.map[m.beforePosY, m.beforePosX] = eMapState.NULL;
-                map.map[m.posY, m.posX] = eMapState.MONSTER;
-            }
-        }
-        public void RespownM()
-        {
-            monsters.Add(new Monster());
+            monster.Add(_mNum, new Monster(posX,posY,map,_mNum));
+            
+            
            
         }
+        //public void Explosion()
+        //{
+        //    UPEX();
+        //    DownEX();
+        //    RightEX();
+        //    LeftEX();
 
+        //    timer.Elapsed += new ElapsedEventHandler(timer_Elapsed);
+        //    timer.Start();
+
+
+
+        //}
         public void BoomEvent()
         {
-            
-                player.boomq.Dequeue().DownTimer();
-            //player.boomq.Dequeue().Explosion();
+            foreach(Boom boom in player.boomq)
+            {
+                if (boom != null && boom._c == false)
+                {
+                    boom.DownTimer();
+                }
+            }
+            Check();
 
         }
+       // public void timer_Elapsed2(object sender, ElapsedEventArgs e)
+       // {
+          //  player.boomq.Dequeue().Explosion();
+          //  b = true;
+            //map.PrintMap();
 
+            //timer2.Peek().AutoReset = false;
+            //timer2.Dequeue();
+        //}
+        public void MonsterCheck()
+        {
+            int c = 0;
+
+            foreach(eMapState s in map.map)
+            {
+                if (s == eMapState.MONSTER)
+                    c++;
+
+            }
+
+            for (int i = 0; i < map.map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.map.GetLength(1); j++)
+                {
+                    if (map.map[i, j] == eMapState.MONSTER && c > monster.Count&&monster.ContainsKey(_mNum)==false) 
+                    {
+                        RespownM(j,i,_mNum,map);
+                        _mNum++;
+                        Console.WriteLine("sss");
+                        Thread.Sleep(1000);
+                    }
+
+                }
+            }
+
+
+            foreach(Monster m in monster.Values)
+            {
+                if (m != null)
+                m.Die();
+
+                
+                    
+            }
+
+            int n=monster.Count;
+
+            for (int j = 0; j <= n; j++)
+            {
+                if (monster.ContainsKey(j) == true)
+                {
+                    monster.Remove(j);
+                }
+
+            }
+
+
+        }
+        public void MapClear()
+        {
+            for (int i = 0; i < map.map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.map.GetLength(1); j++)
+                {
+                    if (map.map[i, j] == eMapState.FIRE)
+                    {
+                        map.map[i, j] = eMapState.NULL;
+                    }
+                   
+                }
+            }
+        }
+
+        public void PlayerItem()
+        {
+            switch (map.map[player.posY, player.posX])
+            {
+                case eMapState.FIRELENGTHITEM:
+                    player.fireLength++;
+                    break;
+            }
+        }
+
+        public void Check()
+        {
+
+            try
+            {
+                foreach (Boom boom in player.boomq)
+                {
+                    if (boom != null && boom._ex == true)
+                    {
+                        player.boomq.Dequeue();
+                        player.boomCount--;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+            
+        }
 
 
     }

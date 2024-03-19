@@ -14,11 +14,17 @@
 
             while (true)
             {
-                f.PrintMap();//플레이어 사방으로 박스 생성을 막아야함
+                f.PrintMap();
+                g.MonsterCheck();
+                //g.MapClear();
                 player.PlayerAction();
+                //g.MapCheck();
+               
+
                 if (player.boomq.Count > 0)
                 {
                     g.BoomEvent();
+                    g.Check();
                 }
                 
                 

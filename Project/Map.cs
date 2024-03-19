@@ -5,18 +5,21 @@ namespace Project
 
     public enum eMapState
     {
-        NULL, BOX, ITEM, PLAYER, MONSTER, BOOM, WILL,FIRE
+        NULL, BOX, FIRELENGTHITEM, PLAYER, MONSTER, BOOM, WILL,FIRE,BOOMPLUSITEM
     }
     public class Map
     {
         private eMapState[,] _map;
+        private Dictionary<string, Box> _box;
 
         public Map(int xSize, int ySize)
         {
             _map = new eMapState[xSize, ySize];
+            _box = new Dictionary<string, Box>();
         }
 
         public eMapState[,] map { get { return _map; } set { _map = value; } }
+        public Dictionary<string, Box> box { get {  return _box; } set { _box = value; } }
 
         public void CreateMape()
         {
@@ -38,6 +41,7 @@ namespace Project
                     else if (random.Next(0, 100) < 30)
                     {
                         _map[i, j] = eMapState.BOX;
+                        _box.Add($"{i},{j}",new Box());
                     }
                     else
                     {
@@ -133,6 +137,36 @@ namespace Project
 
         //    }
 
+        public void MapCheck()
+        {
+            for (int i = 0; i < map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.GetLength(1); j++)
+                {
+                    if (map[i, j] == eMapState.FIRE && box.ContainsKey($"{i},{j}") == true)
+                    {
+                        box[$"{i},{j}"].DistroyBox(this, j, i);
+                        box.Remove($"{i},{j}");
+                    }
+
+                }
+            }
+        }
+
+        public void MapClear()
+        {
+            for (int i = 0; i < map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.GetLength(1); j++)
+                {
+                    if (map[i, j] == eMapState.FIRE)
+                    {
+                        map[i, j] = eMapState.NULL;
+                    }
+
+                }
+            }
+        }
         public virtual void PrintMap()
         {
             Console.SetCursorPosition(0, 0);
@@ -154,9 +188,9 @@ namespace Project
                             Console.Write("■");
                             Console.ResetColor();
                             break;
-                        case eMapState.ITEM:
+                        case eMapState.FIRELENGTHITEM:
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.Write("■");
+                            Console.Write("$ ");
                             Console.ResetColor();
                             break;
                         case eMapState.PLAYER:
@@ -182,6 +216,11 @@ namespace Project
                         case eMapState.FIRE:
                             Console.ForegroundColor = ConsoleColor.DarkRed;
                             Console.Write("♨");
+                            Console.ResetColor();
+                            break;
+                        case eMapState.BOOMPLUSITEM:
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            Console.Write("↑");
                             Console.ResetColor();
                             break;
                     }
