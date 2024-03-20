@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -13,22 +14,15 @@ namespace Project
     
     internal class GameManger
     {
-
         private Map map;
         private Player player;
-        private List<Monster> monsters;
-        private Dictionary<int, Monster> monster;
         private int _mNum;
         public bool b;
-       // Queue<System.Timers.Timer> timer2; //= new System.Timers.Timer(3000);
 
 
         public GameManger(Map map, Player player)
         {
-            //timer2 = new Queue<System.Timers.Timer>();
             _mNum = 0;
-            monsters = new List<Monster>();
-            monster = new Dictionary<int, Monster>();
             this.map = map;
             this.player = player;
             b=false;
@@ -40,174 +34,71 @@ namespace Project
             map.map[player.posX, player.posY] = eMapState.PLAYER;
         }
 
-        //public void SetMovePlayer()
-        //{
-        //    ConsoleKeyInfo key = Console.ReadKey(true);
-
-        //    switch (key.Key)
-        //    {
-        //        case ConsoleKey.RightArrow:
-        //            if (map.map[player.posY, (player.posX) + 1] == eMapState.NULL)
-        //            {
-        //                player.RightMove();
-        //                if (map.map[player.beforePosY, player.beforePosX] != eMapState.BOOM)
-        //                {
-        //                    map.map[player.beforePosY, player.beforePosX] = eMapState.NULL;
-        //                }
-        //                map.map[player.posY, player.posX] = eMapState.PLAYER;
-        //                break;
-        //            }
-        //            else
-        //            {
-        //                return;
-        //            }
-        //        case ConsoleKey.LeftArrow:
-        //            if (map.map[player.posY, (player.posX) - 1] == eMapState.NULL)
-        //            {
-        //                player.LeftMove();
-        //                if (map.map[player.beforePosY, player.beforePosX] != eMapState.BOOM)
-        //                {
-        //                    map.map[player.beforePosY, player.beforePosX] = eMapState.NULL;
-        //                }
-        //                map.map[player.posY, player.posX] = eMapState.PLAYER;
-        //                break;
-        //            }
-        //            else
-        //            {
-        //                return;
-        //            }
-        //        case ConsoleKey.UpArrow:
-        //            if (map.map[(player.posY) - 1, player.posX] == eMapState.NULL)
-        //            {
-        //                player.UPMove();
-        //                if (map.map[player.beforePosY, player.beforePosX] != eMapState.BOOM)
-        //                {
-        //                    map.map[player.beforePosY, player.beforePosX] = eMapState.NULL;
-        //                }
-        //                map.map[player.posY, player.posX] = eMapState.PLAYER;
-        //                break;
-        //            }
-        //            else
-        //            {
-        //                return;
-        //            }
-        //        case ConsoleKey.DownArrow:
-        //            if (map.map[player.posY + 1, player.posX] == eMapState.NULL)
-        //            {
-        //                player.DownMove();
-        //                if (map.map[player.beforePosY, player.beforePosX] != eMapState.BOOM)
-        //                {
-        //                    map.map[player.beforePosY, player.beforePosX] = eMapState.NULL;
-        //                }
-        //                map.map[player.posY, player.posX] = eMapState.PLAYER;
-        //                break;
-        //            }
-        //            else
-        //            {
-        //                return;
-        //            }
 
 
-        //    }
-
-
-
-        //}
-        //public void SetMoveMonster()
-        //{
-        //    foreach (Monster m in monsters)
-        //    {
-        //        map.map[m.beforePosY, m.beforePosX] = eMapState.NULL;
-        //        map.map[m.posY, m.posX] = eMapState.MONSTER;
-        //    }
-        //}
-        public void RespownM(int posX,int posY,int Num, Map map)
+        public bool ClearGame()
         {
-            monster.Add(_mNum, new Monster(posX,posY,map,_mNum));
-            
-            
-           
-        }
-        //public void Explosion()
-        //{
-        //    UPEX();
-        //    DownEX();
-        //    RightEX();
-        //    LeftEX();
-
-        //    timer.Elapsed += new ElapsedEventHandler(timer_Elapsed);
-        //    timer.Start();
-
-
-
-        //}
-        public void BoomEvent()
-        {
-            foreach(Boom boom in player.boomq)
+            foreach (eMapState map in map.map)
             {
-                if (boom != null && boom._c == false)
+                if(map == eMapState.MONSTER || map == eMapState.BOX)
                 {
-                    boom.DownTimer();
+                    return false;
                 }
+
             }
-            Check();
+            return true;
+        }
+
+        public void MonsterMove()
+        {
+            foreach(Monster monster in map.monsters.Values)
+            {
+                monster.Move();
+            }
+        }
+
+
+        public bool PlayerDieCheck()
+        {
+            player.Die();
+
+            if (player._dead == true)
+            {
+                map.map[player.posY, player.posX] = eMapState.MONSTER;
+                return true;
+            }
+            else if (player._die == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 
         }
-       // public void timer_Elapsed2(object sender, ElapsedEventArgs e)
-       // {
-          //  player.boomq.Dequeue().Explosion();
-          //  b = true;
-            //map.PrintMap();
 
-            //timer2.Peek().AutoReset = false;
-            //timer2.Dequeue();
-        //}
-        public void MonsterCheck()
+        public void MonsterDingCheck()
         {
-            int c = 0;
-
-            foreach(eMapState s in map.map)
+            Dictionary<string,Monster>m=new Dictionary<string,Monster>();
+            foreach (Monster monster in map.monsters.Values)
             {
-                if (s == eMapState.MONSTER)
-                    c++;
-
-            }
-
-            for (int i = 0; i < map.map.GetLength(0); i++)
-            {
-                for (int j = 0; j < map.map.GetLength(1); j++)
+                monster.Die();
+                if(monster._b == true)
                 {
-                    if (map.map[i, j] == eMapState.MONSTER && c > monster.Count&&monster.ContainsKey(_mNum)==false) 
-                    {
-                        RespownM(j,i,_mNum,map);
-                        _mNum++;
-                        Console.WriteLine("sss");
-                        Thread.Sleep(1000);
-                    }
-
+                    m.Add($"{monster._yKey},{monster._xKey}",monster);
                 }
-            }
-
-
-            foreach(Monster m in monster.Values)
-            {
-                if (m != null)
-                m.Die();
-
                 
-                    
             }
 
-            int n=monster.Count;
-
-            for (int j = 0; j <= n; j++)
+            foreach (string s in m.Keys)
             {
-                if (monster.ContainsKey(j) == true)
+                if (map.monsters.ContainsKey(s) == true)
                 {
-                    monster.Remove(j);
+                    map.monsters.Remove(s);
                 }
-
             }
+
 
 
         }

@@ -14,7 +14,6 @@ namespace Project
         public bool bo;
 
         private Item _item;
-        Monster _monster; 
 
         public Box()
         {
@@ -27,18 +26,24 @@ namespace Project
         {
             Random random = new Random();
 
-            if (random.Next(0, 100) < 5)
+            if (random.Next(0, 100) < 10)
             {
                 _item.SetFireLengthItem(map, posX, posY);
             }
-            else if(random.Next(0, 100) < 10)
+            else if (random.Next(0, 100) < 20)
             {
                 _item.SetBoomPlusItem(map, posX, posY);
             }
+            else if (random.Next(0, 100) < 40) 
+            {
+                if (map.monsters.ContainsKey($"{posY},{posX}") == false)
+                {
+                    map.monsters.Add($"{posY},{posX}", new Monster(posX, posY, map));
+                }
+            }
             else
             {
-                map.map[posY, posX] = eMapState.MONSTER;
-                Console.WriteLine($"{posX},{posY}");
+                map.map[posY, posX] = eMapState.NULL;
             }
         }
     }

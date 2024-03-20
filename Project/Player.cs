@@ -15,6 +15,9 @@ namespace Project
         private int _fireLength;
         private int _maxBoomCount;
         private int _boomCount;
+        public bool _die;
+        public bool _dead;
+
 
         public int fireLength { get { return _fireLength; } set { _fireLength = value; } }
         public int maxBoomCount { get { return _maxBoomCount; } set { _maxBoomCount = value; } }
@@ -24,15 +27,28 @@ namespace Project
         public Player(Map map) : base()
         {
             this.map = map;
+            _die = false;
             _maxBoomCount = 1;
             _boomQueue = new Queue<Boom>();
-            posX = 10;
-            posY = 10;
+            posX = 2;
+            posY = 2;
             beforePosX = posX;
             beforePosY = posY;
             _fireLength = 2;
             _boomCount = 1;
             
+        }
+
+        public void Die()
+        {
+            if (map.map[posY, posX] == eMapState.MONSTER)
+            {
+                _dead = true;
+            }
+            else if (map.map[posY, posX] == eMapState.FIRE)
+            {
+                _die = true;
+            }
         }
 
         public bool MoveRightCheck()
@@ -112,8 +128,9 @@ namespace Project
                             map.map[beforePosY, beforePosX] = eMapState.NULL;
                         }
                         GetItem();
+                        Die();
                         map.map[posY, posX] = eMapState.PLAYER;
-                        
+
                         
                         break;
                     }
@@ -130,6 +147,7 @@ namespace Project
                             map.map[beforePosY, beforePosX] = eMapState.NULL;
                         }
                         GetItem();
+                        Die();
                         map.map[posY, posX] = eMapState.PLAYER;
                         break;
                     }
@@ -146,6 +164,7 @@ namespace Project
                             map.map[beforePosY, beforePosX] = eMapState.NULL;
                         }
                         GetItem();
+                        Die();
                         map.map[posY, posX] = eMapState.PLAYER;
                         break;
                     }
@@ -162,6 +181,7 @@ namespace Project
                             map.map[beforePosY, beforePosX] = eMapState.NULL;
                         }
                         GetItem();
+                        Die();
                         map.map[posY, posX] = eMapState.PLAYER;
                         break;
                     }
@@ -237,7 +257,6 @@ namespace Project
         {
             map.map[posY, posX] = eMapState.BOOM;
             _boomQueue.Enqueue(new Boom(posX, posY, _fireLength, map));
-
 
         }
 
