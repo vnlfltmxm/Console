@@ -15,8 +15,8 @@ namespace Project
         private int _fireLength;
         private int _maxBoomCount;
         private int _boomCount;
-        public bool _die;
-        public bool _dead;
+        private bool _dead;
+
 
 
         public int fireLength { get { return _fireLength; } set { _fireLength = value; } }
@@ -24,21 +24,21 @@ namespace Project
         public int boomCount { get { return _boomCount; } set { _boomCount = value; } }
         public Queue<Boom> boomq { get { return _boomQueue; } set { _boomQueue = value; } }
 
-        public Player(Map map) : base()
+        public bool dead { get { return _dead; } }
+
+        public Player(Map map, int posX, int posY) : base(map, posX, posY)
         {
             this.map = map;
-            _die = false;
             _maxBoomCount = 1;
             _boomQueue = new Queue<Boom>();
-            posX = 2;
-            posY = 2;
-            beforePosX = posX;
-            beforePosY = posY;
             _fireLength = 2;
             _boomCount = 1;
             
         }
-
+        public void SetPlayer()
+        {
+            map.map[posY, posX] = eMapState.PLAYER;
+        }
         public void Die()
         {
             if (map.map[posY, posX] == eMapState.MONSTER)
@@ -47,64 +47,7 @@ namespace Project
             }
             else if (map.map[posY, posX] == eMapState.FIRE)
             {
-                _die = true;
-            }
-        }
-
-        public bool MoveRightCheck()
-        {
-            switch (map.map[posY, posX + 1])
-            {
-                case eMapState.WILL:
-                    return false;
-                case eMapState.BOX:
-                    return false;
-                case eMapState.BOOM:
-                    return false;
-                default:
-                    return true;
-            }
-        }
-        public bool MoveUPCheck()
-        {
-            switch (map.map[posY - 1, posX])
-            {
-                case eMapState.WILL:
-                    return false;
-                case eMapState.BOX:
-                    return false;
-                case eMapState.BOOM:
-                    return false;
-                default:
-                    return true;
-            }
-        }
-        public bool MoveLeftCheck()
-        {
-            switch (map.map[posY, posX - 1])
-            {
-                case eMapState.WILL:
-                    return false;
-                case eMapState.BOX:
-                    return false;
-                case eMapState.BOOM:
-                    return false;
-                default:
-                    return true;
-            }
-        }
-        public bool MoveDownCheck()
-        {
-            switch (map.map[posY + 1 , posX])
-            {
-                case eMapState.WILL:
-                    return false;
-                case eMapState.BOX:
-                    return false;
-                case eMapState.BOOM:
-                    return false;
-                default:
-                    return true;
+                die = true;
             }
         }
 
@@ -120,7 +63,7 @@ namespace Project
             switch (key.Key)
             {
                 case ConsoleKey.RightArrow:
-                    if (MoveRightCheck() == true)
+                    if (RightMoveCheck() == true)
                     {
                         RightMove();
                         if (map.map[beforePosY, beforePosX] != eMapState.BOOM)
@@ -139,7 +82,7 @@ namespace Project
                         return;
                     }
                 case ConsoleKey.LeftArrow:
-                    if (MoveLeftCheck() == true)
+                    if (LeftMoveCheck() == true)
                     {
                         LeftMove();
                         if (map.map[beforePosY, beforePosX] != eMapState.BOOM)
@@ -156,7 +99,7 @@ namespace Project
                         return;
                     }
                 case ConsoleKey.UpArrow:
-                    if (MoveUPCheck() == true)
+                    if (UPMoveCheck() == true)
                     {
                         UPMove();
                         if (map.map[beforePosY, beforePosX] != eMapState.BOOM)
@@ -173,7 +116,7 @@ namespace Project
                         return;
                     }
                 case ConsoleKey.DownArrow:
-                    if (MoveDownCheck() == true)
+                    if (DownMoveCheck() == true)
                     {
                         DownMove();
                         if (map.map[beforePosY, beforePosX] != eMapState.BOOM)
@@ -190,6 +133,7 @@ namespace Project
                         return;
                     }
                 case ConsoleKey.Spacebar:
+                    CheckBoom();
                     if (_boomCount <= _maxBoomCount && map.map[posY, posX] != eMapState.BOOM)
                     {
                         _boomCount++;
@@ -198,6 +142,7 @@ namespace Project
                     }
                     
                     break;
+
 
 
 
@@ -214,31 +159,7 @@ namespace Project
 
 
         }
-        public void RightMove()
-        {
-            beforePosX = posX;
-            beforePosY = posY;
-            posX++;
-        }
-        public void LeftMove()
-        {
-            beforePosX = posX;
-            beforePosY = posY;
-            posX--;
-        }
-        public void UPMove()
-        {
-            beforePosX = posX;
-            beforePosY = posY;
-            posY--;
-        }
-        public void DownMove()
-        {
-            beforePosX = posX;
-            beforePosY = posY;
-            posY++;
-        }
-
+        
         public void GetItem()
         {
             switch (map.map[posY,posX])
@@ -256,7 +177,28 @@ namespace Project
         private void SetBoom()
         {
             map.map[posY, posX] = eMapState.BOOM;
-            _boomQueue.Enqueue(new Boom(posX, posY, _fireLength, map));
+            _boomQueue.Enqueue(new Boom(posX, posY, _fireLength,map));
+
+        }
+
+        public void CheckBoom()
+        {
+
+            try
+            {
+                foreach (Boom boom in boomq)
+                {
+                    if (boom != null && boom._ex == true)
+                    {
+                        boomq.Dequeue();
+                        boomCount--;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
 
         }
 

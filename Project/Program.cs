@@ -4,11 +4,20 @@
     {
         static void Main(string[] args)
         {
-            Map f = new Map(10, 10);
-            Player player = new Player(f);
+            Console.CursorVisible = false;
+            Random random = new Random();
+            Map f = new Map(5, 10);
+            Player player = new Player(f, random.Next(1,f.map.GetLength(1) - 1), random.Next(1,f.map.GetLength(0) - 1));
             GameManger g = new GameManger(f, player);
+            //Menu menu = new Menu();
 
-            g.SetPlayer();
+            //    menu.Menu1();
+
+            //Console.ReadLine();
+            //    Console.Clear();
+            
+
+            player.SetPlayer();
             f.CreateMape();
             
 
@@ -17,9 +26,8 @@
             {
                 f.PrintMap();
                 player.PlayerAction();
-                g.Check();
-                g.MonsterMove();
-                g.MonsterDingCheck();
+                  g.MonsterMove();
+                g.MonsterDieCheck();
 
                 if (g.PlayerDieCheck() == true || g.ClearGame() == true)
                 {

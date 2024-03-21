@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -16,13 +17,8 @@ namespace Project
         private int _posY;
         private int _fireLength;
         public bool _ex;
-        public bool _c;
-        public bool _u;
-        public bool _d;
-        public bool _r;
-        public bool _l;
 
-        
+
 
 
         System.Timers.Timer timer = new System.Timers.Timer(500);
@@ -31,13 +27,8 @@ namespace Project
 
         public Boom(int posX, int posY, int fireLength, Map map)
         {
-            _d = false;
-            _u = false;
-            _l = false;
-            _r = false;
-            _c=false;
             _ex = false;
-            
+
             _posX = posX;
             _posY = posY;
             _fireLength = fireLength;
@@ -48,7 +39,6 @@ namespace Project
 
         public void DownTimer()
         {
-            _c = true;
             timer2.Elapsed += new ElapsedEventHandler(timer_Elapsed2);
             timer2.Start();
         }
@@ -63,17 +53,17 @@ namespace Project
                 }
                 if (map.map[_posY, _posX - i] == eMapState.BOX)
                 {
-                    
+
                     map.map[_posY, _posX - i] = eMapState.FIRE;
                     break;
                 }
-                if (map.map[_posY , _posX - i] == eMapState.BOOM && i != 0)
+                if (map.map[_posY, _posX - i] == eMapState.BOOM && i != 0)
                 {
-                    
-                    map.map[_posY , _posX - i] = eMapState.BOOM;
+
+                    map.map[_posY, _posX - i] = eMapState.BOOM;
                     continue;
                 }
-               
+
                 map.map[_posY, _posX - i] = eMapState.FIRE;
             }
         }
@@ -90,9 +80,9 @@ namespace Project
                     map.map[_posY, _posX + i] = eMapState.FIRE;
                     break;
                 }
-                if (map.map[_posY , _posX + i] == eMapState.BOOM && i != 0)
+                if (map.map[_posY, _posX + i] == eMapState.BOOM && i != 0)
                 {
-                    map.map[_posY , _posX + i] = eMapState.BOOM;
+                    map.map[_posY, _posX + i] = eMapState.BOOM;
                     continue;
                 }
                 map.map[_posY, _posX + i] = eMapState.FIRE;
@@ -135,7 +125,7 @@ namespace Project
                     map.map[_posY - i, _posX] = eMapState.FIRE;
                     break;
                 }
-                if (map.map[_posY - i, _posX] == eMapState.BOOM && i !=0 )
+                if (map.map[_posY - i, _posX] == eMapState.BOOM && i != 0)
                 {
                     map.map[_posY - i, _posX] = eMapState.BOOM;
                     continue;
@@ -146,22 +136,22 @@ namespace Project
         }
         public void Explosion()
         {
-                UPEX();
-                DownEX();
-                RightEX();
-                LeftEX();
-            
+            UPEX();
+            DownEX();
+            RightEX();
+            LeftEX();
+
             timer.Elapsed += new ElapsedEventHandler(timer_Elapsed);
-                timer.Start();
-            
+            timer.Start();
+
 
 
         }
         public void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            
+
             Thread.Sleep(100);
-            
+
             map.MapCheck();
             map.MapClear();
 

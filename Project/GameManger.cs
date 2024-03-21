@@ -16,23 +16,17 @@ namespace Project
     {
         private Map map;
         private Player player;
-        private int _mNum;
-        public bool b;
+
 
 
         public GameManger(Map map, Player player)
         {
-            _mNum = 0;
             this.map = map;
             this.player = player;
-            b=false;
 
         }
 
-        public void SetPlayer()
-        {
-            map.map[player.posX, player.posY] = eMapState.PLAYER;
-        }
+        
 
 
 
@@ -53,7 +47,7 @@ namespace Project
         {
             foreach(Monster monster in map.monsters.Values)
             {
-                monster.Move();
+                monster.MoveAction();
             }
         }
 
@@ -62,12 +56,12 @@ namespace Project
         {
             player.Die();
 
-            if (player._dead == true)
+            if (player.dead == true)
             {
                 map.map[player.posY, player.posX] = eMapState.MONSTER;
                 return true;
             }
-            else if (player._die == true)
+            else if (player.die == true)
             {
                 return true;
             }
@@ -78,15 +72,16 @@ namespace Project
 
         }
 
-        public void MonsterDingCheck()
+        public void MonsterDieCheck()
         {
             Dictionary<string,Monster>m=new Dictionary<string,Monster>();
+
             foreach (Monster monster in map.monsters.Values)
             {
                 monster.Die();
-                if(monster._b == true)
+                if(monster.die == true)
                 {
-                    m.Add($"{monster._yKey},{monster._xKey}",monster);
+                    m.Add($"{monster.yKey},{monster.xKey}",monster);
                 }
                 
             }
@@ -99,54 +94,11 @@ namespace Project
                 }
             }
 
-
+           
 
         }
-        public void MapClear()
-        {
-            for (int i = 0; i < map.map.GetLength(0); i++)
-            {
-                for (int j = 0; j < map.map.GetLength(1); j++)
-                {
-                    if (map.map[i, j] == eMapState.FIRE)
-                    {
-                        map.map[i, j] = eMapState.NULL;
-                    }
-                   
-                }
-            }
-        }
 
-        public void PlayerItem()
-        {
-            switch (map.map[player.posY, player.posX])
-            {
-                case eMapState.FIRELENGTHITEM:
-                    player.fireLength++;
-                    break;
-            }
-        }
-
-        public void Check()
-        {
-
-            try
-            {
-                foreach (Boom boom in player.boomq)
-                {
-                    if (boom != null && boom._ex == true)
-                    {
-                        player.boomq.Dequeue();
-                        player.boomCount--;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return;
-            }
-            
-        }
+        
 
 
     }

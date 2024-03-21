@@ -15,51 +15,48 @@ namespace Project
     }
 
 
-    public class Monster:Unit
+    public class Monster:Unit,IUnit
     {
-        Map map;
-        Stopwatch _stopwatch;
-        int _s = 1000;
+        private mDir _dir;
 
-        mDir _dir;
-        public bool _b;
-       public int _num;
-        public int _xKey;
-        public int _yKey;
+        private Map map;
+        private Stopwatch _stopwatch;
 
-        private int _targetPosX;
-        private int _targetPosY;
+        private int _xKey;
+        private int _yKey;
+        private int _s = 1000;
 
-        public Monster(int posX,int posY,Map map) : base()
+        public int xKey { get { return _xKey; } }
+        public int yKey { get { return _yKey; } }
+
+
+
+        public Monster(int posX,int posY,Map map) : base(map,posX,posY)
         {
-            _b = false;
             _stopwatch = new Stopwatch();
+        //    this.posY = posY;
+            //this.posX = posX;
+            this.map = map;
+
             _xKey = posX;
             _yKey = posY;
-            this.posY = posY;
-            this.posX = posX;
-            this.map = map;
 
             map.map[posY, posX] = eMapState.MONSTER;
             _stopwatch.Start();
         }
 
-        public void RespownM()
-        {
-            map.map[posY, posX] = eMapState.MONSTER;
-        }
 
         public void Die()
         {
             if (map.map[posY, posX]==eMapState.FIRE)
             {
-                _b = true;
+                die = true;
             }
         }
-      
-       
 
-        public bool LeftMoveCheck()
+
+
+        public override bool LeftMoveCheck()
         {
             switch (map.map[posY, posX - 1])
             {
@@ -77,7 +74,7 @@ namespace Project
                     return true;
             }
         }
-        public bool RightMoveCheck()
+        public override bool RightMoveCheck()
         {
             switch (map.map[posY, posX + 1])
             {
@@ -95,7 +92,7 @@ namespace Project
                     return true;
             }
         }
-        public bool UPMoveCheck()
+        public override bool UPMoveCheck()
         {
             switch (map.map[posY - 1, posX])
             {
@@ -113,7 +110,7 @@ namespace Project
                     return true;
             }
         }
-        public bool DownMoveCheck()
+        public override bool DownMoveCheck()
         {
             switch (map.map[posY + 1, posX])
             {
@@ -128,35 +125,35 @@ namespace Project
                 case eMapState.WILL:
                     return false;
                 default:
-                    return true; 
+                    return true;
             }
         }
-        public void RightMove()
-        {
-            beforePosX = posX;
-            beforePosY = posY;
-            posX++;
-        }
-        public void LeftMove()
-        {
-            beforePosX = posX;
-            beforePosY = posY;
-            posX--;
-        }
-        public void UPMove()
-        {
-            beforePosX = posX;
-            beforePosY = posY;
-            posY--;
-        }
-        public void DownMove()
-        {
-            beforePosX = posX;
-            beforePosY = posY;
-            posY++;
-        }
+        //public void RightMove()
+        //{
+        //    beforePosX = posX;
+        //    beforePosY = posY;
+        //    posX++;
+        //}
+        //public void LeftMove()
+        //{
+        //    beforePosX = posX;
+        //    beforePosY = posY;
+        //    posX--;
+        //}
+        //public void UPMove()
+        //{
+        //    beforePosX = posX;
+        //    beforePosY = posY;
+        //    posY--;
+        //}
+        //public void DownMove()
+        //{
+        //    beforePosX = posX;
+        //    beforePosY = posY;
+        //    posY++;
+        //}
 
-        public void ChoceDir()
+        public void ChooseDir()
         {
             Random random = new Random();
 
@@ -178,19 +175,23 @@ namespace Project
             }
         }
 
-        public void MoveCheck()
+        public bool MoveCheck()
         {
-            LeftMoveCheck();
-            RightMoveCheck();
-            UPMoveCheck();
-            DownMoveCheck();
+            if (LeftMoveCheck() == false && RightMoveCheck() == false && UPMoveCheck() == false && DownMoveCheck() == false)
+            {
+                return false;
+            }
+            
+            return true;
+            
+            
         }
 
-        public void Move()
+        public void MoveAction()
         {
-            if (_stopwatch.ElapsedMilliseconds >= _s)
+            if (_stopwatch.ElapsedMilliseconds >= _s && MoveCheck() == true) 
             {
-                ChoceDir();
+                ChooseDir();
 
                 switch (_dir)
                 {
@@ -203,7 +204,7 @@ namespace Project
                         }
                         else
                         {
-                            Move();
+                            MoveAction();
                         }
                         break;
                     case mDir.DOWN:
@@ -215,7 +216,7 @@ namespace Project
                         }
                         else
                         {
-                            Move();
+                            MoveAction();
                         }
                         break;
                     case mDir.LEFT:
@@ -227,7 +228,7 @@ namespace Project
                         }
                         else
                         {
-                            Move();
+                            MoveAction();
                         }
                         break;
                     case mDir.RIGT:
@@ -239,7 +240,7 @@ namespace Project
                         }
                         else
                         {
-                            Move();
+                            MoveAction();
                         }
                         break;
                 }

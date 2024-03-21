@@ -11,13 +11,10 @@ namespace Project
         private int _posX;
         private int _posY;
 
-        public bool bo;
-
         private Item _item;
 
         public Box()
         {
-            bo = false;
             _item = new Item();
         }
 
