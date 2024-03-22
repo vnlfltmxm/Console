@@ -12,17 +12,24 @@ using System.Timers;
 namespace Project
 {
     
-    internal class GameManger
+    public class GameManger
     {
         private Map map;
         private Player player;
+        private bool _clear;
+        private bool _over;
 
 
+        public bool gameOver { get { return _over; } }
+
+        public bool gameClear { get { return _clear; } }
 
         public GameManger(Map map, Player player)
         {
             this.map = map;
             this.player = player;
+            _clear = false;
+            _over = false;
 
         }
 
@@ -40,6 +47,7 @@ namespace Project
                 }
 
             }
+            _clear = true;
             return true;
         }
 
@@ -59,10 +67,12 @@ namespace Project
             if (player.dead == true)
             {
                 map.map[player.posY, player.posX] = eMapState.MONSTER;
+                _over = true;
                 return true;
             }
             else if (player.die == true)
             {
+                _over = true;
                 return true;
             }
             else

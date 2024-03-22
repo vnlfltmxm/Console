@@ -5,36 +5,33 @@ namespace Project
 
     public enum eMapState
     {
-        NULL, BOX, FIRELENGTHITEM, PLAYER, MONSTER, BOOM, WILL,FIRE,BOOMPLUSITEM
+        NULL, BOX, FIRELENGTHITEM, PLAYER, MONSTER, BOOM, WILL, FIRE, BOOMPLUSITEM
     }
     public class Map
     {
         private eMapState[,] _map;
         private Dictionary<string, Box> _box;
         private Dictionary<string, Monster> _monster;
-        //private List<Monster> _monsters;
         public Map(int xSize, int ySize)
         {
             _map = new eMapState[xSize, ySize];
             _box = new Dictionary<string, Box>();
             _monster = new Dictionary<string, Monster>();
-            //_monsters= new List<Monster>();
-    }
+        }
 
         public eMapState[,] map { get { return _map; } set { _map = value; } }
-        public Dictionary<string, Box> box { get {  return _box; } set { _box = value; } }
-        //public List<Monster> monsters { get { return _monsters; } set { _monsters = value; } }
-        public Dictionary<string, Monster> monsters { get { return _monster; } set {  monsters = value; } }
+        public Dictionary<string, Box> box { get { return _box; } set { _box = value; } }
+        public Dictionary<string, Monster> monsters { get { return _monster; } set { monsters = value; } }
 
-        public bool PlayerCheck(int posX,int posY)
+        public bool PlayerCheck(int posX, int posY)
         {
             if (map[posY, posX + 1] == eMapState.PLAYER)
                 return true;
             if (map[posY, posX - 1] == eMapState.PLAYER)
                 return true;
-            if (map[posY+1, posX] == eMapState.PLAYER)
+            if (map[posY + 1, posX] == eMapState.PLAYER)
                 return true;
-            if (map[posY-1, posX + 1] == eMapState.PLAYER)
+            if (map[posY - 1, posX + 1] == eMapState.PLAYER)
                 return true;
 
             return false;
@@ -60,7 +57,7 @@ namespace Project
                         {
                             _map[i, j] = eMapState.WILL;
                         }
-                        else if (random.Next(0, 100) < 30 && PlayerCheck(j,i) == false)
+                        else if (random.Next(0, 100) < 30 && PlayerCheck(j, i) == false)
                         {
                             _map[i, j] = eMapState.BOX;
                             _box.Add($"{i},{j}", new Box());
@@ -70,11 +67,11 @@ namespace Project
                             _map[i, j] = eMapState.NULL;
                         }
                     }
-                    
+
                 }
             }
         }
-        
+
 
         public void MapCheck()
         {
@@ -106,10 +103,10 @@ namespace Project
                 }
             }
 
-            
+
         }
 
-       
+
         public virtual void PrintMap()
         {
             Console.SetCursorPosition(0, 0);
@@ -162,7 +159,7 @@ namespace Project
                             Console.ResetColor();
                             break;
                         case eMapState.BOOMPLUSITEM:
-                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.Write("↑");
                             Console.ResetColor();
                             break;
@@ -171,9 +168,9 @@ namespace Project
                 Console.ForegroundColor = ConsoleColor.Black;
                 Console.ResetColor();
                 Console.WriteLine();
-                
+
             }
-            
+
         }
     }
 }

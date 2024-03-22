@@ -1,4 +1,7 @@
-﻿namespace Project
+﻿using System.Diagnostics;
+using System.Timers;
+
+namespace Project
 {
     internal class Program
     {
@@ -6,38 +9,67 @@
         {
             Console.CursorVisible = false;
             Random random = new Random();
-            Map f = new Map(5, 10);
-            Player player = new Player(f, random.Next(1,f.map.GetLength(1) - 1), random.Next(1,f.map.GetLength(0) - 1));
-            GameManger g = new GameManger(f, player);
-            //Menu menu = new Menu();
+            Map map = new Map(15, 15);
+            Player player = new Player(map, random.Next(1,map.map.GetLength(1) - 1), random.Next(1,map.map.GetLength(0) - 1));
+            GameManger gm = new GameManger(map, player);
+            Menu menu = new Menu();
+            PrintManger pm=new PrintManger(map,player);
 
-            //    menu.Menu1();
+            Console.SetWindowSize(100, 60);
 
-            //Console.ReadLine();
-            //    Console.Clear();
-            
+            pm.PrintAnime();
 
+            while (true)
+            {
+                pm.PrintLogo();
+                pm.PrintMenu();
+                ConsoleKeyInfo key = Console.ReadKey();
+                if (key.Key == ConsoleKey.Enter)
+                    break;
+                else
+                {
+                    Console.Clear();
+                    continue;
+                }
+
+            }
+            Console.Clear();
             player.SetPlayer();
-            f.CreateMape();
-            
+            map.CreateMape();
+            pm.PrintControl();
+
 
 
             while (true)
             {
-                f.PrintMap();
+                pm.PrintMap();
+                pm.PrintState();
                 player.PlayerAction();
-                  g.MonsterMove();
-                g.MonsterDieCheck();
+                gm.MonsterMove();
+                gm.MonsterDieCheck();
 
-                if (g.PlayerDieCheck() == true || g.ClearGame() == true)
+                if (gm.PlayerDieCheck() == true || gm.ClearGame() == true)
                 {
-                    f.PrintMap();
+                    pm.PrintMap();
+                    Thread.Sleep(2000);
+
+                }
+
+                if (gm.gameClear == true)
+                {
+                    Console.Clear();
+                    pm.PrintGameClear();
                     break;
                 }
-                
-            }
-            
 
+                if (gm.gameOver == true)
+                {
+                    Console.Clear();
+                    pm.PrintGameOver();
+                    break;
+                }
+
+            }
         }
     }
 }

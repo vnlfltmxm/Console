@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Project
 {
-    internal class Player: Unit
+    public class Player: Unit
     {
         Map map;
         Queue<Boom> _boomQueue;

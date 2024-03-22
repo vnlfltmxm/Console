@@ -9,7 +9,7 @@ using System.Timers;
 
 namespace Project
 {
-    internal class Boom
+    public class Boom
     {
         Map map;
 
